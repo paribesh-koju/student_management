@@ -13,6 +13,7 @@ class _NumberGameState extends State<NumberGame> {
   int correctAnswers = 0;
   int incorrectAnswers = 0;
   int totalPlays = 0;
+  final int maxPlays = 10;
 
   @override
   void initState() {
@@ -23,13 +24,14 @@ class _NumberGameState extends State<NumberGame> {
   void generateNumbers() {
     number1 = _random.nextInt(100) + 1;
     number2 = _random.nextInt(100) + 1;
-    while (number1 == number2) {  // Ensure numbers are not the same
+    while (number1 == number2) {
+      // Ensure numbers are not the same
       number2 = _random.nextInt(100) + 1;
     }
   }
 
   void checkAnswer(bool isCorrect) {
-    if (totalPlays < 10) {
+    if (totalPlays < maxPlays) {
       setState(() {
         if (isCorrect) {
           correctAnswers++;
@@ -37,7 +39,7 @@ class _NumberGameState extends State<NumberGame> {
           incorrectAnswers++;
         }
         totalPlays++;
-        if (totalPlays < 10) {
+        if (totalPlays < maxPlays) {
           generateNumbers();
         }
       });
@@ -57,42 +59,62 @@ class _NumberGameState extends State<NumberGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Number Generator Game'),
+        title: const Text('Number Generator Game'),
         centerTitle: true,
+        backgroundColor: Colors.limeAccent,
       ),
-
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            if (totalPlays < 10) ...[
-              Text('Choose the larger number', style: TextStyle(fontSize: 22)),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  ElevatedButton(
-                    onPressed: () => checkAnswer(number1 > number2),
-                    child: Text('$number1', style: TextStyle(fontSize: 24)),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => checkAnswer(number2 > number1),
-                    child: Text('$number2', style: TextStyle(fontSize: 24)),
-                  ),
-                ],
+      body: Container(
+        color: Colors.lime,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              if (totalPlays < maxPlays) ...[
+                const Text('Choose the larger number',
+                    style: TextStyle(fontSize: 22)),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white),
+                      onPressed: () => checkAnswer(number1 > number2),
+                      child: Text('$number1',
+                          style: const TextStyle(fontSize: 24)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white),
+                      onPressed: () => checkAnswer(number2 > number1),
+                      child: Text('$number2',
+                          style: const TextStyle(fontSize: 24)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text('Questions done: $totalPlays',
+                    style: const TextStyle(fontSize: 18)),
+                Text('Questions remaining: ${maxPlays - totalPlays}',
+                    style: const TextStyle(fontSize: 18)),
+              ] else ...[
+                const Text('Game Stats',
+                    style:
+                    TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                Text('Correct answers: $correctAnswers',
+                    style: const TextStyle(fontSize: 18)),
+                Text('Incorrect answers: $incorrectAnswers',
+                    style: const TextStyle(fontSize: 18)),
+              ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.cyanAccent),
+                onPressed: restartGame,
+                child: const Text('Restart', style: TextStyle(fontSize: 20)),
               ),
-            ] else ...[
-              Text('Game Over', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              Text('Correct answers: $correctAnswers', style: TextStyle(fontSize: 18)),
-              Text('Incorrect answers: $incorrectAnswers', style: TextStyle(fontSize: 18)),
             ],
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: restartGame,
-              child: Text('Restart', style: TextStyle(fontSize: 20)),
-            ),
-          ],
+          ),
         ),
       ),
     );
